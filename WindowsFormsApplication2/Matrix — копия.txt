@@ -1,0 +1,291 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+//--------------------------------------
+//using System.ComponentModel;
+//using System.Data;
+//using System.Drawing;
+//using System.Windows.Forms;
+//--------------------------------------
+namespace MatrixCalculator
+{
+    class Matrix
+    {
+        string _name;
+        List<List<MatrixItem>> _martix;
+        public Matrix(string name,int countRows,int countCols)
+        {
+            _name = name;
+            _martix = new List<List<MatrixItem>>();
+            for (int i = 0; i < countRows; i++)
+            {
+                _martix.Add(new List<MatrixItem>());
+                for (int j = 0; j < countCols; j++)
+                {
+                    _martix[i].Add(new MatrixItem());
+                }
+            }
+            foreach (var row in _martix)
+            {
+                row.AddRange(new List<MatrixItem>(countCols));
+            }
+        }
+
+        public string Name
+        {
+            get
+            {
+                return _name;
+            }
+        }
+
+        public List<MatrixItem> this[int index]
+        {
+            get
+            {
+                return _martix[index];
+            }
+            set
+            {
+                _martix[index] = value;
+            }
+        }
+
+        public int CountRows
+        {
+            get
+            {
+                return _martix.Count;
+            }
+        }
+        public int CountColumns
+        {
+            get
+            {
+                if(_martix[0] != null)
+                {
+                    return _martix[0].Count;
+                }
+
+                return 0;
+            }
+        }
+
+        public static Matrix operator+(Matrix a, Matrix b)
+        {
+            if(a.CountRows != b.CountRows || a.CountColumns != b.CountColumns)
+            {
+                throw new ArgumentOutOfRangeException("Сложение матриц невозможно: не совпадают их размеры");
+            }
+
+            Matrix result = new Matrix("", a.CountRows, a.CountColumns);
+            
+
+            for (int i = 0; i < a.CountRows; i++)
+            {
+                for (int j = 0; j < a.CountColumns; j++)
+                {
+                    result[i][j].Value = a[i][j].Value + b[i][j].Value;
+                }
+            }
+
+            return result;
+        }
+
+        public static Matrix operator *(Matrix a, Matrix b)
+        {
+            if (a.CountColumns != b.CountRows)
+            {
+                throw new ArgumentOutOfRangeException("Произведение матриц невозможно: они не согласованы");
+            }
+
+            Matrix result = new Matrix("", a.CountRows, b.CountColumns);
+
+            for (int i = 0; i < a.CountRows; i++)
+            {
+                for (int j = 0; j < b.CountColumns; j++)
+                {
+                    result[i][j].Value = 0;
+
+                    for (int k = 0; k < a.CountColumns; k++)
+                    {
+                        result[i][j].Value += a[i][k].Value * b[k][j].Value;
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        public Matrix minus (Matrix a, Matrix b)
+        {
+            if (a.CountRows != b.CountRows || a.CountColumns != b.CountColumns)
+            {
+                throw new ArgumentOutOfRangeException("Вычитание матриц невозможно: не совпадают их размеры");
+            }
+
+            Matrix result = new Matrix("", a.CountRows, a.CountColumns);
+
+
+            b *= (-1);
+            result = a + b;
+
+            return result;
+        }
+
+        public Matrix power (Matrix a, int degree)
+        {
+            Matrix result = new Matrix("", a.CountRows, a.CountColumns);
+
+            if (degree == 0)
+            {
+                for (int i = 0; i < a.CountRows; i++)
+                {
+                    for (int j = 0; j < a.CountColumns; j++)
+                    {
+                        if (i == j)
+                        {
+                            result[i][j].Value = 1;
+                        }
+                        else
+                        {
+                            result[i][j].Value = 0;
+                        }
+                    }
+                }
+                return result;
+            }
+
+            result = a;
+
+            for (int i = 1; i < degree; i++)
+            {
+                result *= a;
+            }
+
+            return result;
+        }
+        //-----------------------------------------------------------------------------
+        public static Matrix operator *(double a, Matrix b)
+        {
+            for (int i = 0; i < b.CountRows; i++)
+                for (int j = 0; j < b.CountColumns; j++)
+                    b[i][j].Value *= Convert.ToDecimal(a);
+            return b;
+        }
+
+        public static Matrix operator *(Matrix b, double a) // !
+        {
+            for (int i = 0; i < b.CountRows; i++)
+                for (int j = 0; j < b.CountColumns; j++)
+                    b[i][j].Value *= Convert.ToDecimal(a);
+            return b;
+        }
+
+        public double Determinant(double[,] matrix = null)
+        {
+            if (matrix == null)
+            {
+                double[,] array = new double[CountRows, CountColumns];
+                for (int i = 0; i < CountRows; i++)
+                    for (int j = 0; j < CountColumns; j++)
+                        array[i, j] = Convert.ToDouble(_martix[i][j].Value);
+                return Determinant(array);
+            }
+            if (matrix.Length == 1)
+                return matrix[0, 0];
+            if (matrix.Length == 4)
+                return matrix[0, 0] * matrix[1, 1] - matrix[0, 1] * matrix[1, 0];
+            double sign = 1, result = 0;
+            for (int i = 0; i < matrix.GetLength(1); i++)
+            {
+                double[,] minor = GetMinor(matrix, i);
+                result += sign * matrix[0, i] * Determinant(minor);
+                sign = -sign;
+            }
+            return result;
+        }
+
+        private double[,] GetMinor(double[,] matrix, int n) // auxiliary function
+        {
+            double[,] result = new double[matrix.GetLength(0) - 1, matrix.GetLength(0) - 1];
+            for (int i = 1; i < matrix.GetLength(0); i++)
+            {
+                for (int j = 0; j < n; j++)
+                    result[i - 1, j] = matrix[i, j];
+                for (int j = n + 1; j < matrix.GetLength(0); j++)
+                    result[i - 1, j - 1] = matrix[i, j];
+            }
+            return result;
+        }
+
+        public Matrix GetMatrixOfMinors(int p, int q)
+        {
+            Matrix TheMatrixOfMinors = new Matrix(_name + "_minor", CountRows - 1, CountColumns - 1);
+
+            for (int i = 0; i < p; i++)
+            {
+                for (int j = 0; j < q; j++)
+                    TheMatrixOfMinors._martix[i][j].Value = _martix[i][j].Value;
+                for (int j = q; j < CountColumns - 1; j++)
+                    TheMatrixOfMinors._martix[i][j].Value = _martix[i][j + 1].Value;
+            }
+
+            for (int i = p; i < CountColumns - 1; i++)
+            {
+                for (int j = q; j < CountRows - 1; j++)
+                    TheMatrixOfMinors._martix[i][j].Value = _martix[i + 1][j + 1].Value;
+                for (int j = 0; j < q; j++)
+                    TheMatrixOfMinors._martix[i][j].Value = _martix[i + 1][j].Value;
+            }
+
+            return TheMatrixOfMinors;
+        }
+
+        public Matrix transposeMatrix(Matrix matrix = null)
+        {
+            Matrix transposedMatrix;
+            if (matrix == null)
+                transposedMatrix = this;
+            else transposedMatrix = matrix;
+            transposedMatrix._name += "_transposed";
+            for (int i = 0; i < CountRows; i++)
+                for (int j = i; j < CountColumns; j++)
+                {
+                    var temp = transposedMatrix._martix[i][j];
+                    transposedMatrix._martix[i][j] = transposedMatrix._martix[j][i];
+                    transposedMatrix._martix[j][i] = temp;
+                }
+            return transposedMatrix;
+        }
+
+        public Matrix MatrixOfAlgebraicComplements()
+        {
+            Matrix matrixOfAlgebraicComplements = new Matrix(_name + "_matrixOfAlgebraicComplements", CountRows, CountColumns);
+            double sign = 1;
+            for (int i = 0; i < CountRows; i++)
+                for (int j = 0; j < CountColumns; j++)
+                {
+                    Matrix temp = GetMatrixOfMinors(i, j);
+                    double[,] array = new double[temp.CountRows, temp.CountColumns];
+                    for (int k = 0; k < temp.CountRows; k++) // converting to double to improve performance
+                        for (int m = 0; m < temp.CountColumns; m++)
+                            array[k, m] = Convert.ToDouble(temp._martix[k][m].Value);
+                    matrixOfAlgebraicComplements._martix[i][j].Value = Convert.ToDecimal(Determinant(array) * sign);
+                    sign = -sign;
+                }
+            return matrixOfAlgebraicComplements;
+        }
+
+        public Matrix InverseMatrix() {
+            if (Determinant() == 0)
+                return null;
+            Matrix inversedMatrix = 1 / Determinant() * transposeMatrix(MatrixOfAlgebraicComplements());
+            inversedMatrix._name = _name + "_inversed";
+            return inversedMatrix;
+        }
+        //-----------------------------------------------------------------------------
+    }
+}

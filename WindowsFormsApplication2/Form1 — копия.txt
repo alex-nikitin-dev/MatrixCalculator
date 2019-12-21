@@ -1,0 +1,321 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace MatrixCalculator
+{
+    public partial class MainForm : Form
+    {
+        List<Matrix> _matrixes;
+        TableLayoutPanel _tblAllMatrixes;
+        Random _random;
+        char _name;
+        public MainForm()
+        {
+            InitializeComponent();
+            _matrixes = new List<Matrix>();
+            _tblAllMatrixes = new TableLayoutPanel();
+
+            grpMain.Controls.Add(_tblAllMatrixes);
+
+            ResetMatrixArray();
+            numRowCount.Value = 5;
+            numColumnCount.Value = 5;
+             _matrixes.Clear();
+             _tblAllMatrixes.Controls.Clear();
+            _random = new Random();
+
+        }
+
+        char NextName()
+        {
+            return _name++;
+        }
+        void ResetMatrixArray()
+        {
+            
+            _matrixes.Clear();
+            _name = 'A';
+
+            _tblAllMatrixes.Controls.Clear();
+            _tblAllMatrixes.ColumnCount = 0;
+            _tblAllMatrixes.RowCount = 0;
+            _tblAllMatrixes.RowStyles.Clear();
+            _tblAllMatrixes.CellBorderStyle = TableLayoutPanelCellBorderStyle.InsetDouble;
+             _tblAllMatrixes.Location = new Point(lblCountRow.Right + 20,lblCountRow.Top);
+            _tblAllMatrixes.Visible = false;
+           
+        }
+        void AddMatrix(int countRows,int countCols)
+        {
+            _matrixes.Add(new Matrix(NextName().ToString(), countRows, countCols));
+        }
+
+        private void MainFormLoad(object sender, EventArgs e)
+        {
+            //Random rnd = new Random();
+            //int[][] a = new int[10][];
+
+            //for (int i = 0; i < a.Length; i++)
+            //{
+            //    a[i] = new int[10];
+            //    for (int j = 0; j < a[i].Length; j++)
+            //    {
+            //        a[i][j] = rnd.Next(0,100);
+            //    }
+            //}
+
+            //for (int i = 0; i < a.Length; i++)
+            //{
+            //    for (int j = 0; j < a[i].Length; j++)
+            //    {
+            //        rtxtAnswer.AppendText(a[i][j].ToString() + "\t");
+            //    }
+            //    rtxtAnswer.AppendText(Environment.NewLine);
+            //}
+        }
+        
+        private void btnCreateMartix_Click(object sender, EventArgs e)
+        {
+            if(_matrixes.Count >= 5)
+            {
+                MessageBox.Show("Добавлено максимальное количество матриц", Application.ProductName);
+                return;
+            }
+
+            _tblAllMatrixes.AutoSize = false;
+            _tblAllMatrixes.RowCount = 3;
+            _tblAllMatrixes.ColumnCount++;
+            AddMatrix((int)numRowCount.Value, (int)numColumnCount.Value);
+            var curMatrix = _matrixes[_matrixes.Count - 1];
+
+            var table = new TableLayoutPanel();
+            for (int i = 0; i < numRowCount.Value; i++)
+            {
+                for (int j = 0; j < numColumnCount.Value; j++)
+                {
+                    var txtItem = new TextBox();
+                    txtItem.Size = new Size(25, 20);
+                    txtItem.Tag = curMatrix[i][j];
+                    txtItem.KeyPress += Txt_KeyPress;
+                    txtItem.TextChanged += TxtItem_TextChanged;
+                    table.Controls.Add(txtItem, j, i);
+                }
+            }
+
+            _tblAllMatrixes.Controls.Add(table, _tblAllMatrixes.ColumnCount - 1, 0);
+            _tblAllMatrixes.RowStyles.Add(new RowStyle());
+
+          
+
+            var lbl = new TextBox();
+            lbl.Text = curMatrix.Name;
+            lbl.Tag = curMatrix;
+            lbl.ReadOnly = true;
+            lbl.Size = new Size(20, lbl.Height);
+            lbl.BorderStyle = BorderStyle.None;
+           
+           
+            _tblAllMatrixes.Controls.Add(lbl, _tblAllMatrixes.ColumnCount - 1, 1);
+            _tblAllMatrixes.RowStyles.Add(new RowStyle());
+            _tblAllMatrixes.RowStyles[1].Height = lbl.Height;
+            lbl.Anchor = AnchorStyles.None;
+
+            var btnDeterm = new Button();
+            btnDeterm.Click += BtnDeterm_Click;
+            btnDeterm.Tag = curMatrix;
+            btnDeterm.Size = new Size(180, btnDeterm.Height);
+            btnDeterm.Text = "Определитель";
+            btnDeterm.Dock = DockStyle.Fill;
+
+            _tblAllMatrixes.Controls.Add(btnDeterm, _tblAllMatrixes.ColumnCount - 1, 2);
+            _tblAllMatrixes.RowStyles.Add(new RowStyle());
+            _tblAllMatrixes.RowStyles[2].Height = btnDeterm.Height;
+
+            lbl.AutoSize = true;
+            table.AutoSize = true;
+            _tblAllMatrixes.AutoSize = true;
+            _tblAllMatrixes.Visible = true;
+        }
+
+        int GetIndexMatrix(string name)
+        {
+            for (int i = 0; i < _matrixes.Count; i++)
+            {
+                if (_matrixes[i].Name == name)
+                    return i;
+            }
+
+            throw new ArgumentOutOfRangeException("Невозможно найти совпадение имени матрицы");
+        }
+        private void TxtItem_TextChanged(object sender, EventArgs e)
+        {
+            var txt = (TextBox)sender;
+            var item = (MatrixItem)txt.Tag;
+
+            decimal value;
+            decimal.TryParse(txt.Text, out value);
+
+            item.Value = value;
+        }
+
+        private void Txt_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!(char.IsDigit(e.KeyChar))
+                && (e.KeyChar != 45)
+                && (e.KeyChar != (char)Keys.Back)
+                && (e.KeyChar != '.'))
+            {
+                e.Handled = true;
+            }
+        }
+
+        //-----------------------------------------------------------------------------
+        private void BtnDeterm_Click(object sender, EventArgs e)
+        {
+            var btn = (Button)sender;
+            var curMartrix = (Matrix)btn.Tag;
+            if (curMartrix.CountRows == 0 || curMartrix.CountColumns == 0) // Error: always false
+                MessageBox.Show("It is impossible to calculate the empty matrix", Application.ProductName);
+            else if(curMartrix.CountRows == 1 && curMartrix.CountColumns == 1)
+                MessageBox.Show(curMartrix[0][0].Value + "", Application.ProductName);
+            else if (curMartrix.CountRows == curMartrix.CountColumns)
+               // MessageBox.Show(curMartrix.Determinant() + "", Application.ProductName);
+                ShowMatrix(curMartrix.InverseMatrix());
+            else MessageBox.Show("The matrix must be of the square form", Application.ProductName);
+        }
+
+        private void BtnInverseMatrix_Click(object sender, EventArgs e)
+        {
+            var btn = (Button)sender;
+            var curMartrix = (Matrix)btn.Tag;
+            if (curMartrix.CountRows == 0 || curMartrix.CountColumns == 0) // Error: always false
+                MessageBox.Show("It is impossible to calculate the empty matrix", Application.ProductName);
+            else if(curMartrix.CountRows == 1 && curMartrix.CountColumns == 1)
+                MessageBox.Show(curMartrix[0][0].Value + "", Application.ProductName);
+            else if (curMartrix.CountRows == curMartrix.CountColumns)
+                ShowMatrix(curMartrix.InverseMatrix());
+            else MessageBox.Show("The matrix must be of the square form", Application.ProductName);
+        }
+        //-----------------------------------------------------------------------------
+        private void rtxtAnswer_TextChanged(object sender, EventArgs e)
+        {
+            //Console.Beep();
+        }
+
+        private void btnClearAll_Click(object sender, EventArgs e)
+        {
+            //-----------------------------------------------------------------------------
+            rtxtAnswer.Clear();
+            //-----------------------------------------------------------------------------
+            ResetMatrixArray();
+        }
+
+        private void ShowMatrix(Matrix matrix)
+        {
+            rtxtAnswer.Clear();
+
+            for (int i = 0; i < matrix.CountRows; i++)
+            {
+                for (int j = 0; j < matrix.CountColumns; j++)
+                {
+                    rtxtAnswer.AppendText(matrix[i][j].Value.ToString() + "\t");
+                }
+                rtxtAnswer.AppendText(Environment.NewLine);
+            }
+        }
+
+        private void btnTestSum_Click(object sender, EventArgs e)
+        {
+            if(_matrixes.Count<2)
+            {
+                return;
+            }
+
+            try
+            {
+                var sum = _matrixes[0] + _matrixes[1];
+                ShowMatrix(sum);
+            }
+            catch (ArgumentOutOfRangeException err)
+            {
+                MessageBox.Show(err.Message, Application.ProductName);
+            }
+        }
+
+        private void FillMatrix(int index)
+        {
+            if(_matrixes.Count <= index)
+            {
+                return;
+            }
+
+            
+
+            for (int i = 0; i < _matrixes[index].CountRows; i++)
+            {
+                for (int j = 0; j < _matrixes[index].CountColumns; j++)
+                {
+                    _matrixes[index][i][j].Value = _random.Next(0, 10);
+                }
+            }
+        }
+
+        private void ShowMatrix(int index)
+        {
+            if (_matrixes.Count <= index)
+            {
+                return;
+            }
+
+            var table = (TableLayoutPanel)_tblAllMatrixes.GetControlFromPosition(index, 0);
+            int countRows = _matrixes[index].CountRows;
+            int countCols = _matrixes[index].CountColumns;
+
+            for (int i = 0; i < countRows; i++)
+            {
+                for (int j = 0; j < countCols; j++)
+                {
+                    var txtItem = (TextBox)table.GetControlFromPosition(j, i);
+                   txtItem.TextChanged -= TxtItem_TextChanged;
+                    txtItem.Text = _matrixes[index][i][j].Value.ToString();
+                    txtItem.TextChanged += TxtItem_TextChanged;
+                }
+            }
+
+        }
+
+        private void btnFillMatrix_Click(object sender, EventArgs e)
+        {
+            for (int i = 0; i <= 1; i++)
+            {
+                FillMatrix(i);
+                ShowMatrix(i);
+            }
+        }
+
+        private void btnMultiply_Click(object sender, EventArgs e)
+        {
+            if (_matrixes.Count < 2)
+            {
+                return;
+            }
+
+            try
+            {
+                var sum = _matrixes[0] * _matrixes[1];
+                ShowMatrix(sum);
+            }
+            catch (ArgumentOutOfRangeException err)
+            {
+                MessageBox.Show(err.Message, Application.ProductName);
+            }
+        }
+    }
+}

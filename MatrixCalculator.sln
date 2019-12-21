@@ -1,0 +1,52 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26403.3
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatrixCalculator", "WindowsFormsApplication2\MatrixCalculator.csproj", "{98044CCB-D6F4-40C1-B15A-31DE5481A98C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatrixCalculatorTests", "MatrixCalculatorTests\MatrixCalculatorTests.csproj", "{95957670-412F-40EF-82CA-E602CA049BB1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinearAlgebra", "LinearAlgebra\LinearAlgebra.csproj", "{8607E979-3AE2-490C-85E5-959CDFF5D387}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{98044CCB-D6F4-40C1-B15A-31DE5481A98C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98044CCB-D6F4-40C1-B15A-31DE5481A98C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98044CCB-D6F4-40C1-B15A-31DE5481A98C}.Debug|x64.ActiveCfg = Debug|x64
+		{98044CCB-D6F4-40C1-B15A-31DE5481A98C}.Debug|x64.Build.0 = Debug|x64
+		{98044CCB-D6F4-40C1-B15A-31DE5481A98C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98044CCB-D6F4-40C1-B15A-31DE5481A98C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{98044CCB-D6F4-40C1-B15A-31DE5481A98C}.Release|x64.ActiveCfg = Release|x64
+		{98044CCB-D6F4-40C1-B15A-31DE5481A98C}.Release|x64.Build.0 = Release|x64
+		{98044CCB-D6F4-40C1-B15A-31DE5481A98C}.Release|x64.Deploy.0 = Release|x64
+		{95957670-412F-40EF-82CA-E602CA049BB1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95957670-412F-40EF-82CA-E602CA049BB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95957670-412F-40EF-82CA-E602CA049BB1}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{95957670-412F-40EF-82CA-E602CA049BB1}.Debug|x64.Build.0 = Debug|Any CPU
+		{95957670-412F-40EF-82CA-E602CA049BB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95957670-412F-40EF-82CA-E602CA049BB1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{95957670-412F-40EF-82CA-E602CA049BB1}.Release|x64.ActiveCfg = Release|Any CPU
+		{95957670-412F-40EF-82CA-E602CA049BB1}.Release|x64.Build.0 = Release|Any CPU
+		{8607E979-3AE2-490C-85E5-959CDFF5D387}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8607E979-3AE2-490C-85E5-959CDFF5D387}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8607E979-3AE2-490C-85E5-959CDFF5D387}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8607E979-3AE2-490C-85E5-959CDFF5D387}.Debug|x64.Build.0 = Debug|Any CPU
+		{8607E979-3AE2-490C-85E5-959CDFF5D387}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8607E979-3AE2-490C-85E5-959CDFF5D387}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8607E979-3AE2-490C-85E5-959CDFF5D387}.Release|x64.ActiveCfg = Release|Any CPU
+		{8607E979-3AE2-490C-85E5-959CDFF5D387}.Release|x64.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6D19CBCE-B199-4688-AF75-4ED74282B340}
+	EndGlobalSection
+EndGlobal
